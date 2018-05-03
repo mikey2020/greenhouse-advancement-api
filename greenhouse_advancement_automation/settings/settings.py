@@ -21,8 +21,8 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/2.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ.get('SECRET_KEY')
-print(os.environ.get('SECRET_KEY'))
+# SECRET_KEY = os.environ.get('SECRET_KEY')
+SECRET_KEY = '6mfwj=yg6_7!2@645m*v*w0m@30zoou-=wup3a17=*e0xvd)!d'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
@@ -36,6 +36,7 @@ REST_FRAMEWORK = {
 # Application definition
 
 INSTALLED_APPS = [
+    'djcelery',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -44,6 +45,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'candidates',
+    'background_task',
 
 ]
 
@@ -132,7 +134,19 @@ USE_I18N = True
 USE_L10N = True
 
 USE_TZ = True
+# BROKER_URL = 'amqp://'
+# CELERY_ACCEPT_CONTENT = ['pickle']
+# CELERY_TASK_SERIALIZER = 'json'
+# CELERY_RESULT_SERIALIZER = 'json'
+# CELERY_RESULT_BACKEND = 'djcelery.backends.database:DatabaseBackend'
+# CELERYBEAT_SCHEDULER = 'djcelery.schedulers.DatabaseScheduler'
 
+BROKER_URL = 'redis://localhost:6379'
+CELERY_RESULT_BACKEND = 'redis://localhost:6379'
+CELERY_ACCEPT_CONTENT = ['application/json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TIMEZONE = 'Africa/Lagos'
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.0/howto/static-files/
