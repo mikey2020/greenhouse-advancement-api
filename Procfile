@@ -1,0 +1,1 @@
+web: gunicorn greenhouse_advancement_automation.wsgi --log-file -
