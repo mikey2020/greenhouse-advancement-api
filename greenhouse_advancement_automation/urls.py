@@ -15,10 +15,14 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import include, path, re_path
-from candidates.views import notify_user
+from candidates.views import notify_user, get_user_application_id, get_jobs, advance_application, get_job_stages_id
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('user/application/id', get_user_application_id),
+    path('jobs/', get_jobs),
+    path('advance-application', advance_application),
+    path('job/ids', get_job_stages_id),
     # path('/$', notify_user),
     re_path('api/(?P<version>(v1|v2))/', include('candidates.urls'))
 ]
