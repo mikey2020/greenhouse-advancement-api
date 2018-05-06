@@ -1,7 +1,9 @@
 from django.shortcuts import render
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
-from .task import myTask
+#from .task import myTask
+from greenhouse_advancement_automation.celery import app
+
 import requests
 import json
 import os
@@ -10,10 +12,12 @@ import datetime
 import celery
 import smtplib
 
+
 # Create your views here.
 
 #from background_task import background
 from django.contrib.auth.models import User
+
 
 emails = [
      "sokunbitaiwo82@gmail.com",
@@ -24,7 +28,7 @@ emails = [
 all_user_ids = []
 # from celery import shared_task
 
-@celery.decorators.periodic_task(run_every=datetime.timedelta(minutes=1)) # here we assume we want it to be run every 5 mins
+#@app.Task()
 def myTask():
     # Do something here
     # like accessing remote apis,
@@ -87,6 +91,7 @@ def advance_application(request):
         }
         payload = request.body.decode("utf-8")
         payload = json.loads(payload)
+        print(payload)
         all_responses = []
         for user in all_user_ids:
             for key, value in user.items():
