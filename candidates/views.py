@@ -1,7 +1,9 @@
 from django.shortcuts import render
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
-from .task import myTask
+#from .task import myTask
+from greenhouse_advancement_automation.celery import app
+
 import requests
 import json
 import os
@@ -10,10 +12,12 @@ import datetime
 import celery
 import smtplib
 
+
 # Create your views here.
 
 #from background_task import background
 from django.contrib.auth.models import User
+
 
 emails = [
      "sokunbitaiwo82@gmail.com",
@@ -24,7 +28,7 @@ emails = [
 all_user_ids = []
 # from celery import shared_task
 
-@celery.decorators.periodic_task(run_every=datetime.timedelta(minutes=1)) # here we assume we want it to be run every 5 mins
+#@app.Task()
 def myTask():
     # Do something here
     # like accessing remote apis,
@@ -57,8 +61,6 @@ def get_user_application_id(request):
     for email in emails:
         response = requests.get('https://harvest.greenhouse.io/v1/candidates?job_id=' + job_id + '&email=' + email, headers=headers)
         application_id = {x["first_name"] + " " + x["last_name"]: x["applications"][0]["id"] for x in response.json()}
-        print(application_id)
-        print(job_id, email)
         all_user_ids.append(application_id)
 
 
@@ -76,10 +78,8 @@ def get_job_stages_id(request):
     job_id = request.GET.get('job_id', '')
     headers = {"Authorization": "Basic N2U5OTgzYTllNjM1NGE0NDFiMzQ5YWYyNjFhYjQ4MmEtMQ=="}
     response = requests.get('https://harvest.greenhouse.io/v1/jobs/' + job_id + '/stages', headers=headers)
-    print(response.json())
     response_ids = response.json()
     stages_id = {y["name"]: y["id"]  for y in response_ids}
-    print(stages_id)
     return Response(stages_id)
 
 @api_view(['POST'])
@@ -91,8 +91,8 @@ def advance_application(request):
         }
         payload = request.body.decode("utf-8")
         payload = json.loads(payload)
+        print(payload)
         all_responses = []
-        print("**********=>=>", len(all_user_ids) )
         for user in all_user_ids:
             for key, value in user.items():
                 response = requests.post('https://harvest.greenhouse.io/v1/applications/' + str(value) + '/advance',
@@ -103,7 +103,6 @@ def advance_application(request):
         return Response(all_responses)
 
 def send_mail(receiver_email):
-    print(os.environ.get('EMAIL'))
     server = smtplib.SMTP('smtp.gmail.com', 587)
     server.starttls()
     server.login(os.environ.get('EMAIL'), os.environ.get('PASSWORD'))

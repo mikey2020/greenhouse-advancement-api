@@ -1,3 +1,3 @@
-from greenhouse_advancement_automation.settings.base_settings import *
+from greenhouse_advancement_automation.settings.settings import *
 
 DEBUG = False
